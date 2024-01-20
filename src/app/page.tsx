@@ -1,72 +1,58 @@
 "use client"
 import { useEffect, useState } from "react"
-import { generateKey, DataEncryption } from "../encryption"
+import { generateKey,  createPass } from "../encryption"
 export default function Home() {
-  const [salt, setSalt] = useState("")
-  const [entry, setEntry] = useState("")
-  const [hash, setHash] = useState("")
-  const [user, setUser] = useState("")
-  const [pass, setPass] = useState("")
-  const [submit, setSubmit] = useState("")
-  useEffect(() => {
-    return () => {}
-  }, [])
+  const [keys, setKeys] = useState<string[]>([])
+  const [submit, setSubmit] = useState(false)
+  const [userData, setUserData] = useState<any>({})
+  const [encryptedData, setEncryptedData] = useState<any>({})
 
+  useEffect(() => {
+    console.table(userData)
+  }, [userData])
   return (
     <div className="flex  flex-col gap-3">
-      <div className="flex gap-3 items-center">
-        <h3>Register</h3>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-          }}
-          className="flex gap-3 flex-wrap"
-        >
-          <input type="text" placeholder="username" />
-          <input type="text" placeholder="password" />
-          <input type="text" placeholder="email" />
-          <input
-            type="submit"
-            value="submit"
-            className="bg-green-500 px-3 py-2 rounded-md  "
-          />
-        </form>
-        <p>salt: {salt}</p>
-      </div>
       <div className="flex gap-3">
-        <h3>Login</h3>
+        <h3>test register</h3>
         <form
-          onSubmit={(e) => {
-            e.preventDefault()
+          className="flex gap-3 flex-wrap"
+          action={async()=>{
+            const {publicKey, privateKey} = await generateKey(userData.username)
+            setKeys([publicKey, privateKey])
+            createPass(userData.password).then((res)=>{
+              setEncryptedData(res)
+            })           
           }}
-          className="flex gap-3 flex-wrap"
+
         >
-          <input type="text" placeholder="username" />
-          <input type="text" placeholder="password" />
-          <input type="text" placeholder="email" />
           <input
-            type="submit"
-            value="submit"
-            className="bg-green-500 px-3 py-2 rounded-md  "
-          />
-        </form>
-      </div>
-      <div className="flex gap-3 flex-col px-5">
-        <p>Test enter entry</p>
-        <form
-          action=""
-          method="post"
-          className="flex gap-3 flex-wrap"
-          id="entry"
-        >
-          <textarea
-            name="formEntry"
-            form="entry"
-            placeholder="Enter here"
-            id="entry"
-            className="border-2 border-black h-40 w-full"
+            type="text"
+            placeholder="username"
             onChange={(e) => {
-              setEntry(e.target.value)
+              setUserData((prev: any) => ({
+                ...prev,
+                username: e.target.value,
+              }))
+            }}
+          />
+          <input
+            type="text"
+            placeholder="password"
+            onChange={(e) => {
+              setUserData((prev: any) => ({
+                ...prev,
+                password: e.target.value,
+              }))
+            }}
+          />
+          <input
+            type="text"
+            placeholder="email"
+            onChange={(e) => {
+              setUserData((prev: any) => ({
+                ...prev,
+                email: e.target.value,
+              }))
             }}
           />
           <input
@@ -75,6 +61,9 @@ export default function Home() {
             className="bg-green-500 px-3 py-2 rounded-md  "
           />
         </form>
+      </div>
+      <div className="flex gap-3 flex-col px-5">
+        <p>data : {JSON.stringify(encryptedData)}</p>
       </div>
     </div>
   )
